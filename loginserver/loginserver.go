@@ -2,16 +2,16 @@ package loginserver
 
 import (
 	"bytes"
-	"code.google.com/p/go.crypto/bcrypt"
 	"fmt"
-	"github.com/frostwind/l2go/config"
-	"github.com/frostwind/l2go/loginserver/clientpackets"
-	"github.com/frostwind/l2go/loginserver/models"
-	"github.com/frostwind/l2go/loginserver/serverpackets"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 	"net"
 	"strconv"
+
+	".././config"
+	"././clientpackets"
+	"././models"
+	"././serverpackets"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 type LoginServer struct {
@@ -39,7 +39,7 @@ func New(cfg config.ConfigObject) *LoginServer {
 	return &LoginServer{config: cfg}
 }
 
-func (l *LoginServer) Init() {
+func (l *LoginServer) init() {
 	var err error
 
 	// Connect to our database
@@ -121,9 +121,9 @@ func (l *LoginServer) kickClient(client *models.Client) {
 
 	for i, item := range l.clients {
 		if bytes.Equal(item.SessionID, client.SessionID) {
-			copy(l.clients[i:], l.clients[i+1:])
-			l.clients[len(l.clients)-1] = nil
-			l.clients = l.clients[:len(l.clients)-1]
+			copy(l.clients[i:], l.clients[i + 1:])
+			l.clients[len(l.clients) - 1] = nil
+			l.clients = l.clients[:len(l.clients) - 1]
 			break
 		}
 	}
@@ -132,10 +132,10 @@ func (l *LoginServer) kickClient(client *models.Client) {
 }
 
 func (l *LoginServer) handleGameServerPackets(gameserver *models.GameServer) {
-  defer gameserver.Socket.Close()
+	defer gameserver.Socket.Close()
 
-  for {
-    opcode, _, err := gameserver.Receive()
+	for {
+		opcode, _, err := gameserver.Receive()
 
 		if err != nil {
 			fmt.Println(err)
@@ -143,13 +143,13 @@ func (l *LoginServer) handleGameServerPackets(gameserver *models.GameServer) {
 			break
 		}
 
-    switch opcode {
-    case 00:
-      fmt.Println("A game server sent a request to register")
-    default:
-      fmt.Println("Can't recognize the packet sent by the gameserver")
-    }
-  }
+		switch opcode {
+		case 00:
+			fmt.Println("A game server sent a request to register")
+		default:
+			fmt.Println("Can't recognize the packet sent by the gameserver")
+		}
+	}
 }
 
 func (l *LoginServer) handleClientPackets(client *models.Client) {
@@ -257,7 +257,7 @@ func (l *LoginServer) handleClientPackets(client *models.Client) {
 			fmt.Printf("The client wants to connect to the server : %d\n", requestPlay.ServerID)
 
 			var buffer []byte
-			if len(l.config.GameServers) >= int(requestPlay.ServerID) && (l.config.GameServers[requestPlay.ServerID-1].Options.Testing == false || client.Account.AccessLevel > ACCESS_LEVEL_PLAYER) {
+			if len(l.config.GameServers) >= int(requestPlay.ServerID) && (l.config.GameServers[requestPlay.ServerID - 1].Options.Testing == false || client.Account.AccessLevel > ACCESS_LEVEL_PLAYER) {
 				if !bytes.Equal(client.SessionID[:8], requestPlay.SessionID) {
 					l.status.hackAttempts += 1
 

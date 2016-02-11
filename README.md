@@ -22,4 +22,7 @@ License
 
 L2Go is under the GNU GPL v3.0 license.
 
+Made with love by Kuo.ChaoYi <Kuo.ChaoYi@gmail.com>
+Made with love by mikesaidani
 Made with love by Frostwind <hi@frostwind.me>
+

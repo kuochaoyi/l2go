@@ -2,8 +2,8 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"os/user"
 )
 
@@ -99,15 +99,15 @@ func Read() ConfigObject {
 	usr, _ := user.Current()
 	dir := usr.HomeDir
 
-	var jsontype ConfigObject
+	var co ConfigObject
 	file, e := ioutil.ReadFile(dir + "/.l2go/config/server.json")
 
 	if e != nil {
-		fmt.Println("Couldn't load the server configuration file. Using the default preset.")
-		json.Unmarshal([]byte(defaultServerConfig), &jsontype)
+		log.Print("Couldn't load the server configuration file. Using the default preset.")
+		json.Unmarshal([]byte(defaultServerConfig), &co)
 	} else {
-		json.Unmarshal(file, &jsontype)
+		json.Unmarshal(file, &co)
 	}
 
-	return jsontype
+	return co
 }
